@@ -135,7 +135,7 @@ class PlotTask():
         while True:
             time.sleep(1)
             try:
-                f = open('%s.log'%self.name, 'r')
+                f = open('%s.log'%self.name, 'r', encoding='utf-8')
                 break
             except:
                 #print('wait log open')
@@ -144,17 +144,20 @@ class PlotTask():
 
         line_r = ''
         while self.thread is not None:
-            line = f.readline()
-            if line is not None and len(line) > 0:
-                line_r += line
-                if line_r.endswith('\n'):
-                    plotInfo.rLine(line_r)
-                    line_r = ''
-                    if plotInfo.end:
-                        plotInfo = PlotInfo()
-                        self.plots.append(plotInfo)
-            else:
-                time.sleep(0.5)
+            try:
+                line = f.readline()
+                if line is not None and len(line) > 0:
+                    line_r += line
+                    if line_r.endswith('\n'):
+                        plotInfo.rLine(line_r)
+                        line_r = ''
+                        if plotInfo.end:
+                            plotInfo = PlotInfo()
+                            self.plots.append(plotInfo)
+                else:
+                    time.sleep(0.5)
+            except:
+                print('line error')
 
     def start(self):
         self.process = Process(target=self.taskProcess, name='%s_subtask'%self.name, args=(self.name, self.parg))
